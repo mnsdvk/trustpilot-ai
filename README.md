@@ -115,6 +115,35 @@ Requirements: Node 18 or newer, a wallet with Monad testnet MON (Chain ID 10143)
 
 Never commit `.env.local`. It holds the agent's private key.
 
+## Integrate your own agent (3 steps)
+
+PolicyVault is not tied to this dashboard. Any agent that can send a transaction can use it.
+
+1. **Deploy or reuse a vault.** Deploy `contracts/PolicyVault.sol` (constructor takes the token, the agent address and the policy), or use the testnet address above. The owner funds it and allowlists recipients.
+2. **Give your agent its own key** and set it as the vault's agent. That key can only call `requestPayment`.
+3. **Call `requestPayment` and read the receipt.**
+
+```ts
+import { createWalletClient, createPublicClient, http, parseEventLogs } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+
+// vaultAbi: the ABI from contracts/PolicyVault.sol. The agent key comes from your own secret store.
+const account = privateKeyToAccount(process.env.AGENT_PRIVATE_KEY as `0x${string}`);
+const chain = { id: 10143, name: "Monad Testnet", nativeCurrency: { name: "MON", symbol: "MON", decimals: 18 },
+  rpcUrls: { default: { http: ["https://testnet-rpc.monad.xyz"] } } };
+const wallet = createWalletClient({ account, chain, transport: http() });
+const publicClient = createPublicClient({ chain, transport: http() });
+const hash = await wallet.writeContract({
+  address: VAULT, abi: vaultAbi, functionName: "requestPayment",
+  args: [recipient, amount, "Pay 20 to Freelancer"], // last arg is stored in the Receipt
+});
+const receipt = await publicClient.waitForTransactionReceipt({ hash });
+const [log] = parseEventLogs({ abi: vaultAbi, eventName: "Receipt", logs: receipt.logs });
+console.log(log.args.outcome, log.args.reason); // Executed, Blocked or Pending, plus the rule that decided
+```
+
+A `Pending` outcome waits until the owner calls `approve(id)` or `reject(id)`. The agent cannot do either.
+
 ## Demo script
 
 1. Show the policy: for example 100 per payment, 150 per day, approval above 50.

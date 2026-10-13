@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { formatUnits, parseAbiItem } from "viem";
 import { promises as fs } from "node:fs";
+export const maxDuration = 60;
 import path from "node:path";
 import { publicClient, requireVault, TOKEN_DECIMALS } from "@/lib/chain";
 import { outcomeName, reasonName, REASON_TEXT } from "@/lib/labels";
