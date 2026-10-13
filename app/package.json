@@ -1,0 +1,23 @@
+{
+  "name": "trustpilot-ai",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "agent-key": "node scripts/gen-agent-key.mjs"
+  },
+  "dependencies": {
+    "next": "15",
+    "react": "19",
+    "react-dom": "19",
+    "viem": "2"
+  },
+  "devDependencies": {
+    "@types/node": "22",
+    "@types/react": "19",
+    "@types/react-dom": "19",
+    "typescript": "5"
+  }
+}
