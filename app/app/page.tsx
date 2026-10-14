@@ -241,7 +241,7 @@ async function getWallet() {
           chainId: chainHex,
           chainName: monadTestnet.name,
           nativeCurrency: monadTestnet.nativeCurrency,
-          rpcUrls: monadTestnet.rpcUrls.default.http as string[],
+          rpcUrls: [...monadTestnet.rpcUrls.default.http],
         },
       ],
     });
